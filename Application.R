@@ -2,7 +2,7 @@
 install.packages("devtools")
 devtools::install_github("muschellij2/neurobase")
 
-
+#This is the reduced cfin_multib data to be able to push in Github
 datapath <- "data/cfin_multib/datareduced.nii.gz"
 
 local_bvals_path = "data/cfin_multib/bval.bval"
