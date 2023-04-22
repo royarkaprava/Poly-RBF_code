@@ -13,14 +13,21 @@ pred_bvals_path <- "HCP_protocol/bvals"
 
 pred_bvecs_path <- "HCP_protocol/bvecs"
 
+#Creating a mask
+mask <- array(0, dim=c(31,  41,  19)) #Dimension of the data in datapath
+mask[10:20, 10:30, 5:12] <- 1
+
 #Predicted on HCP grid
-out <- DWI_Processing(data_path=datapath,
+K=4
+N=10
+out <- PolyRBF(data_path=datapath, mask=mask,
                       local_bvals_path,local_bvecs_path,
                       pred_bvals_path=pred_bvals_path,pred_bvecs_path=pred_bvecs_path,
-                      order=4,Mb=10, sig = 0.01)
+                      order=K,Mb=N, sig = 0.01)
 
 #Fitted signal on its own grid of bvals and bvecs
-out <- DWI_Processing(data_path=datapath,
+#Here mask=NULL, which will prompt the method to be applied on the whole brain
+out <- PolyRBF(data_path=datapath, mask=NULL,
                       local_bvals_path,local_bvecs_path,
                       pred_bvals_path=NULL,pred_bvecs_path=NULL,
-                      order=4,Mb=10, sig = 0.01)
+                      order=K,Mb=N, sig = 0.01)
