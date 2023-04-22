@@ -1,4 +1,4 @@
-DWI_Processing<-function(data_path,
+PolyRBF<-function(data_path, mask=NULL,
                          local_bvals_path,local_bvecs_path,
                          pred_bvals_path=NULL,pred_bvecs_path=NULL,
                          order,Mb=10, sig = 0.01){
@@ -10,7 +10,7 @@ DWI_Processing<-function(data_path,
   
   ### Contributors : ###########################################################
   ### Writer: Arkaprava Roy
-  ### Wrap-upper : Zhou Lan
+  ### Wrapper : Zhou Lan
   ### Other Writers: Zhengwu Zhang
   ##############################################################################
   
@@ -43,6 +43,10 @@ DWI_Processing<-function(data_path,
   
   ## 1. Read the data
   data=fast_readnii(data_path)
+  
+  if(!is.null(mask)){
+    data <- array(apply(data, 4, FUN=function(x){x*mask}), dim(data))
+  }
   
   ## 2. Read b-values and b-vectors
   bval <- read.table(local_bvals_path, quote="\"", comment.char="")
