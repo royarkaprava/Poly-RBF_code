@@ -9,10 +9,6 @@ local_bvals_path = "data/cfin_multib/bval.bval"
 
 local_bvecs_path <- "data/cfin_multib/bvec.bvec"
 
-pred_bvals_path <- "HCP_protocol/bvals"
-
-pred_bvecs_path <- "HCP_protocol/bvecs"
-
 #Creating a mask
 mask <- array(0, dim=c(31,  41,  19)) #Dimension of the data in datapath
 mask[10:20, 10:30, 5:12] <- 1
