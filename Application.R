@@ -19,7 +19,7 @@ mask[10:20, 10:30, 5:12] <- 1
 
 #Predicted on HCP grid
 K=4
-N=10
+N=20
 out <- PolyRBF(data_path=datapath, mask=mask,
                       local_bvals_path,local_bvecs_path,
                       pred_bvals_path=pred_bvals_path,pred_bvecs_path=pred_bvecs_path,
@@ -31,3 +31,7 @@ out <- PolyRBF(data_path=datapath, mask=NULL,
                       local_bvals_path,local_bvecs_path,
                       pred_bvals_path=NULL,pred_bvecs_path=NULL,
                       order=K,Mb=N, sig = 0.01)
+
+
+data=fast_readnii(datapath)
+plot(density(data-out$DATApred))
