@@ -1,10 +1,11 @@
-PolyRBFgivenN_K<-function(data_path, mask=NULL,
-                         local_bvals_path,local_bvecs_path,
-                         pred_bvals_path=NULL,pred_bvecs_path=NULL,
-                         order,Mb=10, sig = 0.01){
+PolyRBF<-function(data,
+                  bval,p,
+                  bvalts,pts,
+                  order,Mb=10, sig = 0.01, bd=NA){
   
-
   
+  bval0 <- bval
+  p0 <- p
   #load the cpp file
   Rcpp::sourceCpp("multitry1.cpp")
   
@@ -20,7 +21,7 @@ PolyRBFgivenN_K<-function(data_path, mask=NULL,
   ###                         if they are set as NULL, we use the local values instead.
   ### order: the polynomial order
   ### Mb=10, sig=0.01 tuning parameters
-
+  
   
   #### Loading required R packages #############################################
   library(neurobase)
@@ -33,40 +34,40 @@ PolyRBFgivenN_K<-function(data_path, mask=NULL,
   
   #### I. Preparing Steps: Reading the Input data ##############################
   ## 0. Checking Argument
-  if(is.null(pred_bvals_path)){
-    pred_bvals_path<-local_bvals_path
-  }
-  
-  if(is.null(pred_bvecs_path)){
-    pred_bvecs_path<-local_bvecs_path
-  }
+  # if(is.null(pred_bvals_path)){
+  #   pred_bvals_path<-local_bvals_path
+  # }
+  # 
+  # if(is.null(pred_bvecs_path)){
+  #   pred_bvecs_path<-local_bvecs_path
+  # }
   
   ## 1. Read the data
-  data=fast_readnii(data_path)
-  
-  if(!is.null(mask)){
-    data <- array(apply(data, 4, FUN=function(x){x*mask}), dim(data))
-  }
+  # data=fast_readnii(data_path)
+  # 
+  # if(!is.null(mask)){
+  #   data <- array(apply(data, 4, FUN=function(x){x*mask}), dim(data))
+  # }
   
   ## 2. Read b-values and b-vectors
-  bval <- read.table(local_bvals_path, quote="\"", comment.char="")
-  p <- read.table(local_bvecs_path, quote="\"", comment.char="")
-  bval <- as.numeric(unlist(bval))
+  # bval <- read.table(local_bvals_path, quote="\"", comment.char="")
+  # p <- read.table(local_bvecs_path, quote="\"", comment.char="")
+  # bval <- as.numeric(unlist(bval))
   
-  bvalHCP <- read.table(pred_bvals_path, quote="\"", comment.char="")
-  pHCP <- read.table(pred_bvecs_path, quote="\"", comment.char="")
-  bvalHCP <- as.numeric(unlist(bvalHCP))
+  # bvalHCP <- read.table(pred_bvals_path, quote="\"", comment.char="")
+  # pHCP <- read.table(pred_bvecs_path, quote="\"", comment.char="")
+  # bvalHCP <- as.numeric(unlist(bvalHCP))
   ##############################################################################
   
   
   ### II. Defining Important Parameters ########################################
-  ind0HCP <- which(bvalHCP==min(bvalHCP))
-  pts=pHCP; bvalts=bvalHCP; 
+  #ind0HCP <- which(bvalHCP==min(bvalHCP))
+  #pts=pHCP; bvalts=bvalHCP; 
   
-  if(length(ind0HCP)){
-    bvalts <- bvalHCP[-ind0HCP]
-    pts <- pHCP[, -ind0HCP]
-  }
+  # if(length(ind0HCP)){
+  #   bvalts <- bvalHCP[-ind0HCP]
+  #   pts <- pHCP[, -ind0HCP]
+  # }
   
   bval <- as.numeric(unlist(bval))
   Mbval <- max(bval)
@@ -161,7 +162,7 @@ PolyRBFgivenN_K<-function(data_path, mask=NULL,
   dis <- as.matrix(dist(t(cbind(p, pmat))))
   dis <- dis[(1:M),(1:Mb+M)]
   
-  bd <- sqrt(2)*mean(dis[dis>0])
+  if(is.na(bd)) bd <- sqrt(2)*mean(dis[dis>0])
   
   basismat <- (dis<=(3*bd/sqrt(2)))*exp(-dis^2/bd^2)
   
@@ -197,8 +198,8 @@ PolyRBFgivenN_K<-function(data_path, mask=NULL,
   out2 <- apply(out2, 4, FUN=function(x){exp(x)*data0})
   out2 <- array(out2, dim=c(dimo,Mts))
   
-  bval1 <- read.table(local_bvals_path, quote="\"", comment.char="")
-  p1 <- read.table(local_bvecs_path, quote="\"", comment.char="")
+  bval1 <- bval0#read.table(local_bvals_path, quote="\"", comment.char="")
+  p1 <- p0#read.table(local_bvecs_path, quote="\"", comment.char="")
   
   bval1 <- as.numeric(unlist(bval1))
   bval2 <- bval1/max(bval1)
